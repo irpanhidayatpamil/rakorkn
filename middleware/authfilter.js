@@ -7,7 +7,6 @@ export const authFilter = {
             const token = authHeader.split(' ')[1];
             const decoded = jwt.verify(token, '5@nghi4ng');
             req.userData = decoded;
-            console.log(req.userData);
             if(req.userData){
                 next();
             }else{

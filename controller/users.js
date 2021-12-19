@@ -91,12 +91,26 @@ export const updateUserWalk = (req, res, next) => {
                 }else{
                     if(result.length){
                         try{
-                            db.query(`UPDATE mUser SET floatWalk = '${ result[0].floatWalk + floatWalk }' WHERE txtId = '${user.txtId}'`, (err, result)=>{
+                            const run = result[0].floatRun + floatWalk;
+                            const txtGroup = result[0].txtGroup;
+                            db.query(`UPDATE mUser SET floatWalk = '${ run }' WHERE txtId = '${user.txtId}'`, (err, result)=>{
                                 if(err){
                                     return response.error(res, err);
                                 }
+                                try{
+                                    const idData = uuidv4();
+                                    db.query(`INSERT INTO  trdata (txtId, txtIdUser, txtTipe, txtGroup, floatData) VALUES ('${idData}', '${user.txtId}','WALK','${txtGroup}','${floatWalk}')`, (err, result)=>{
+                                        //ignore
+                                        if(err){
+                                            console.log(err);
+                                        }
+                                    })
+                                }catch(e){
+                                    console.log(e);
+                                }
                                 return response.success(res, { message: ' Success'})
-                            })
+                            });
+
                         }catch(e){
                             return response.error(res, 3);
                         }
@@ -116,7 +130,6 @@ export const updateUserRun= (req, res) => {
         try{
             const { floatRun } = req.body;
             const user = req.userData;
-    
             db.query(
                 `SELECT * FROM mUser WHERE txtId = '${user.txtId}' `,
                 (error, result) => {
@@ -125,9 +138,22 @@ export const updateUserRun= (req, res) => {
                     }else{
                         if(result.length){
                             try{
-                                db.query(`UPDATE mUser SET floatRun = '${ result[0].floatRun + floatRun }' WHERE txtId = '${user.txtId}'`, (err, result)=>{
+                                const run = result[0].floatRun + floatRun;
+                                const txtGroup = result[0].txtGroup;
+                                db.query(`UPDATE mUser SET floatRun = '${ run }' WHERE txtId = '${user.txtId}'`, (err, result)=>{
                                     if(err){
                                         return response.error(res, err);
+                                    }
+                                    try{
+                                        const idData = uuidv4();
+                                        db.query(`INSERT INTO  trdata (txtId, txtIdUser, txtTipe, txtGroup, floatData) VALUES ('${idData}', '${user.txtId}','RUN','${txtGroup}','${floatRun}')`, (err, result)=>{
+                                            //ignore
+                                            if(err){
+                                                console.log(err);
+                                            }
+                                        })
+                                    }catch(e){
+                                        console.log(e);
                                     }
                                     return response.success(res, { message: ' Success'})
                                 })
@@ -150,7 +176,6 @@ export const updateUserSepeda= (req, res) => {
     try{
         const { floatSepeda } = req.body;
         const user = req.userData;
-        let floatCurrentSepeda = 0;
         db.query(
             `SELECT * FROM mUser WHERE txtId = '${user.txtId}' `,
             (error, result) => {
@@ -158,23 +183,37 @@ export const updateUserSepeda= (req, res) => {
                     return response.error(res, error);
                 }else{
                     if(result.length){
-                        floatCurrentSepeda = result[0].floatSepeda;
+                        try{
+                            const run = result[0].floatSepeda+ floatSepeda;
+                            const txtGroup = result[0].txtGroup;
+                            db.query(`UPDATE mUser SET floatSepeda = '${run}' WHERE txtId = '${user.txtId}'`, (err, result)=>{
+                                if(err){
+                                    console.log('cccc');
+                                    return response.error(res, err);
+                                }
+                                try{
+                                    const idData = uuidv4();
+                                    db.query(`INSERT INTO  trdata (txtId, txtIdUser, txtTipe, txtGroup, floatData) VALUES ('${idData}', '${user.txtId}','SEPEDA','${txtGroup}','${floatSepeda}')`, (err, result)=>{
+                                        //ignore
+                                        if(err){
+                                            console.log(err);
+                                        }
+                                    })
+                                }catch(e){
+                                    console.log(e);
+                                }
+                                return response.success(res, { message: ' Success'})
+                            })
+                        }catch(e){
+                            return response.error(res, e);
+                        }
                     }else{
                         return response.error(res, 'Terjadi kesalahan');
                     }
                 }
 
             })
-            try{
-                db.query(`UPDATE mUser SET floatSepeda = ${floatCurrentSepeda+ floatSepeda} WHERE txtId = '${user.txtId}'`, (err, result)=>{
-                    if(err){
-                        return response.error(res, err);
-                    }
-                    return response.success(res, { message: ' Success'})
-                })
-            }catch(e){
-                return response.error(res, e);
-            }
+
     }catch(e){
         return response.error(res, e);
     }

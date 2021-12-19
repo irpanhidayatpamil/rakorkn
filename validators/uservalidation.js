@@ -9,7 +9,7 @@ export const userValidation = {
         if(!req.body.txtGroup){
             return response.error(res, "Group salah")
         }
-        if(!req.body.txtPassword){
+        if(!req.body.txtPassword || req.txtPassword.lentgh < 5){
             return response.error(res, "password salah")
         }
         if(!req.body.txtRole){
